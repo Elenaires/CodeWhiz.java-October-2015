@@ -1,0 +1,16 @@
+
+Node mergeLists(Node a, Node b) {
+    if (a == null) {
+        return b;
+    } else if (b == null) {
+        return a;
+    }
+
+    if (a.data < b.data) {
+        a.next = mergeLists(a.next, b);
+        return a;
+    } else {
+        b.next = mergeLists(a, b.next);
+        return b;
+    }
+}
