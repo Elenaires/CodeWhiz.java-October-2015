@@ -1,0 +1,118 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int q = in.nextInt();
+        for(int a0 = 0; a0 < q; a0++){
+            int n = in.nextInt();
+            LinkedList<Integer>[] vertices = new LinkedList[n];
+         
+            for(int i = 0; i < vertices.length; i++)
+            {
+                vertices[i] = new LinkedList<Integer>();                
+            }
+            int m = in.nextInt();
+            for(int a1 = 0; a1 < m; a1++){
+                int u = in.nextInt();
+                int v = in.nextInt();
+           
+                vertices[u-1].add(v-1);
+                vertices[v-1].add(u-1);
+            }
+            int s = in.nextInt();
+            
+            getMinDistance(vertices, s-1);
+            System.out.println();
+        }
+        in.close();
+    }
+    
+    public static class Entry
+    {
+           private int vertex;
+           private int distance;
+            
+           public Entry()
+           {
+               vertex = 0;
+               distance = 0;
+           }
+            
+            public Entry(int inVertex, int inDistance)
+            {
+                vertex = inVertex;
+                distance = inDistance;
+            }
+    }
+    
+    public static void getMinDistance(LinkedList<Integer>[] array, int source)
+    {
+        boolean[] visited = new boolean[array.length];
+        int[] distances = new int[array.length];
+        for(int i = 0; i < distances.length; i++)
+        {
+            distances[i] = -1;
+        }
+        
+        Queue<Entry> queue = new LinkedList<Entry>();
+        Entry entry = new Entry(source, 0);
+        
+        visited[source] = true;
+        queue.add(entry);
+        
+        int vertex = 0; int distance = 0;
+        
+        while(!queue.isEmpty())
+        {
+            entry = queue.remove();
+            vertex = entry.vertex;
+            distance = entry.distance;
+            
+            /*if(array[vertex] != null)
+            {*/ // for some reason the below causes termination due to time out
+                /*for(int i = 0; i < array[vertex].size(); i++)
+                {
+               
+                    if(!visited[array[vertex].get(i)])
+                    {
+               
+                        visited[array[vertex].get(i)] = true;
+                  
+                        Entry newEntry = new Entry(array[vertex].get(i), distance+1);
+                        //System.out.print((distance+1)*6 + " ");
+                        distances[newEntry.vertex] = (distance+1)*6;
+                        queue.add(newEntry);
+                    }
+                }*/
+                for(int adjacent : array[vertex])
+                {
+                    if(!visited[adjacent])
+                    {
+                        visited[adjacent] = true;
+                        Entry newEntry = new Entry(adjacent, distance+1);
+                        distances[adjacent] = newEntry.distance * 6;
+                        queue.add(newEntry);
+                    }
+                }
+            /*}*/
+            
+        }
+        
+        for(int i = 0; i < distances.length; i++)
+        {
+            if(i != source)
+            {
+                System.out.print(distances[i] + " ");
+            }
+            
+        }
+  
+    }
+}
+
