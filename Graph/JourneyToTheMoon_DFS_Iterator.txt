@@ -1,0 +1,101 @@
+// using DFS with Iterator
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) 
+    {
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        int p = in.nextInt();
+ 
+        Node[] nodes = new Node[n];
+        for(int i = 0; i < n; i++)
+        {
+            nodes[i] = new Node(i);
+        }
+        
+        for(int i = 0; i < p; i++)
+        {
+            int source = in.nextInt();
+            int target = in.nextInt();
+            
+            nodes[source].adjacentList.add(target);
+            nodes[target].adjacentList.add(source);
+        }
+        
+        long result = journeyToMoon(nodes);
+        System.out.println(result);
+        in.close();
+    }
+    
+    public static class Node
+    {
+        int index;
+        LinkedList<Integer> adjacentList;
+        boolean visited;
+        
+        public Node(int inIndex)
+        {
+            index = inIndex;
+            adjacentList = new LinkedList<Integer>();
+            visited = false;
+        }
+    }
+    
+    // using DFS
+    public static long journeyToMoon(Node[] nodes)
+    {
+        long result = 0;
+       
+        Stack<Node> stack = new Stack<Node>();
+        LinkedList<Integer> list = new LinkedList<Integer>();
+        
+        for(int i = 0; i < nodes.length; i++)
+        { 
+            if(!nodes[i].visited)
+            {
+                nodes[i].visited = true;
+                stack.push(nodes[i]);
+                int nodeCount = 1;
+                while(!stack.isEmpty())
+                {
+                    Node current = stack.peek();
+                    Iterator iter = current.adjacentList.iterator();
+                    while(iter.hasNext())
+                    {
+                        int adjacentNode = (int)iter.next();
+                        if(!nodes[adjacentNode].visited)
+                        {
+                            nodes[adjacentNode].visited = true;
+                            stack.push(nodes[adjacentNode]);
+                            nodeCount++;
+                            current = stack.peek();
+                            iter = current.adjacentList.iterator();
+                        }
+                    }
+                      
+                    stack.pop();
+                }
+                list.add(nodeCount);               
+            }
+        }
+
+        // use long in order to pass test case 11
+        long sum = 0;
+        
+        // (a*b) + (a+b)*c + (a+b+c)*d
+        for(int i : list)
+        {
+            result += sum*i;
+            sum += i;    
+        }   
+  
+        return result;
+    }
+}
+
