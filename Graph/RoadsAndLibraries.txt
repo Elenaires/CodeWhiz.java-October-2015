@@ -1,0 +1,104 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int query = in.nextInt();
+        
+        for(int i = 0; i < query; i++)
+        {
+            int numCity = in.nextInt();
+            int numRoad = in.nextInt();
+            int libraryCost = in.nextInt();
+            int roadCost = in.nextInt();
+            
+            Node[] cities = new Node[numCity];
+            for(int y = 0; y < numCity; y++)
+            {
+                cities[y] = new Node(y);
+            }
+            
+            int source = 0;
+            int target = 0;
+            for(int j = 0; j < numRoad; j++)
+            {
+                source = in.nextInt() - 1;
+                target = in.nextInt() - 1;
+                
+                cities[source].adjacentList.add(target);
+                cities[target].adjacentList.add(source);
+            }
+            
+            long result = roadsAndLibraries(libraryCost, roadCost, cities);
+            System.out.println(result);
+        }
+        in.close();
+    }
+    
+    // use long to pass test cases
+    public static long roadsAndLibraries(int libraryCost, int roadCost, Node[] cities) 
+    {
+        long totalCost = 0;
+        if(roadCost >= libraryCost) // cheaper to just build library at every city
+        {
+            totalCost = (long)cities.length * (long)libraryCost;
+        }
+        else // build 1 library at each connected group of cities, build roads to connect them
+        {
+            LinkedList<Integer> list = new LinkedList<Integer>();
+            Stack<Node> stack = new Stack<Node>();
+        
+            for(int i = 0; i < cities.length; i++)
+            {
+                int connectedCitiesCount = 0;
+                if(!cities[i].visited)
+                {
+                    cities[i].visited = true;
+                    stack.push(cities[i]);
+                    Node current;
+                    while(!stack.isEmpty())
+                    {
+                        current = stack.pop();
+                        for(int adjacentNode : current.adjacentList)
+                        {
+                            if(!cities[adjacentNode].visited)
+                            {
+                                cities[adjacentNode].visited = true;
+                                stack.push(cities[adjacentNode]);
+                                connectedCitiesCount++;
+                            }
+                        }
+                    }           
+                    list.add(connectedCitiesCount);         
+                }
+            }
+        
+            long minLibraryNeeded = (long)list.size();
+            long minRoadNeeded = (long)cities.length - (long)minLibraryNeeded;
+        
+            totalCost = (minLibraryNeeded * (long)libraryCost) + (minRoadNeeded * (long)roadCost);
+ 
+        }
+         return totalCost;   
+    }
+    
+    public static class Node
+    {
+        int index;
+        boolean visited;
+        LinkedList<Integer> adjacentList;
+        
+        public Node(int index)
+        {
+            this.index = index;
+            visited = false;
+            adjacentList = new LinkedList<Integer>();
+        }
+    }  
+}
+
