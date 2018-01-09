@@ -1,0 +1,105 @@
+// using path compression weighted quick union
+
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+ 
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int query = in.nextInt();
+        for(int a0 = 0; a0 < query; a0++){
+            int numCity = in.nextInt();
+            int numRoad = in.nextInt();
+            int libraryCost = in.nextInt();
+            int roadCost = in.nextInt();
+            int[][] cities = new int[numRoad][2];
+            for(int cities_i = 0; cities_i < numRoad; cities_i++){
+                for(int cities_j = 0; cities_j < 2; cities_j++){
+                    cities[cities_i][cities_j] = in.nextInt() - 1;
+                }
+            }
+            long result = roadsAndLibraries(numCity, libraryCost, roadCost, cities);
+            System.out.println(result);
+        }
+        in.close();
+    }
+    
+    static long roadsAndLibraries(int numCity, int libraryCost, int roadCost, int[][] cities) 
+    {
+        long result = 0;
+        if(roadCost >= libraryCost)
+        {
+            result = (long)libraryCost * (long)numCity;
+        }
+        else
+        {
+            int[] weight = new int[numCity];
+            int[] cityRoot = new int[numCity];
+            int group = 0;
+        
+            for(int i = 0; i < numCity; i++)
+            {
+                weight[i] = 1;
+                cityRoot[i] = i;
+            }
+        
+            for(int i = 0; i < cities.length; i++)
+            {
+                if(!connected(cities[i][0], cities[i][1], cityRoot))
+                {
+                    union(cities[i][0], cities[i][1], weight, cityRoot);
+                }   
+            }
+        
+            for(int i = 0; i < cityRoot.length; i++)
+            {
+                if(cityRoot[i] == i)
+                {
+                    group++;
+                }
+            }
+            
+            result = (long)group * (long)libraryCost + (long)(numCity - group) * (long)roadCost;
+        }
+        
+        return result;
+    }
+  
+    public static boolean connected(int p, int q, int[] cityRoot)
+    {
+        return root(p, cityRoot) == root(q, cityRoot);
+    }
+    
+    public static void union(int p, int q, int[] weight, int[] cityRoot)
+    {
+        int rootP = root(p, cityRoot);
+        int rootQ = root(q, cityRoot);
+        
+        if(rank[rootP] < rank[rootQ])
+        {
+            cityRoot[rootP] = rootQ;
+            weight[rootQ] += weight[rootP];
+        }
+        else
+        {
+            cityRoot[rootQ] = rootP;
+            weight[rootP] += weight[rootQ];
+        }
+        
+    }
+    public static int root(int i, int[] cityRoot)
+    {
+        while (i != cityRoot[i])
+        {
+            cityRoot[i] = cityRoot[cityRoot[i]]; // to keep the tree almost flat
+            i = cityRoot[i];
+        }
+        return i;
+    }    
+}
+
